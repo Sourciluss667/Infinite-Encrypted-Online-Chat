@@ -1,0 +1,32 @@
+datasource postgres {
+  provider = "postgresql"
+  url      = env("POSTGRESQL_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  createdAt         DateTime  @default(now())
+  encryptedMessages Message[] @relation(name: "authorizedUsers")
+  firstName         String?
+  id                String    @id @default(cuid())
+  lastName          String?
+  password          String
+  roles             String[]
+  updatedAt         DateTime  @updatedAt
+  username          String    @unique
+  writtenMessages   Message[] @relation(name: "author")
+}
+
+model Message {
+  author          User     @relation(name: "author", fields: [authorId], references: [id])
+  authorId        String
+  authorizedUsers User[]   @relation(name: "authorizedUsers")
+  content         String
+  createdAt       DateTime @default(now())
+  id              String   @id @default(cuid())
+  isPrivate       Boolean?
+  updatedAt       DateTime @updatedAt
+}
